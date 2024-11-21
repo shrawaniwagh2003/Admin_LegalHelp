@@ -1,0 +1,160 @@
+'use client';
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { CloudFog } from "lucide-react";
+
+export default function CaseDetails() {
+  const [cases, setCases] = useState([]); // Default state is an empty array
+  const [formData, setFormData] = useState({
+    name: "",
+    caseType: "",
+    underSection: "",
+    dateOfBirth: "",
+    gender: "",
+    phoneNumber: "",
+    email: "",
+    state: "",
+    city: "",
+    street: "",
+    zipCode: "",
+    incidentDate: "",
+    incidentState: "",
+    incidentCity: "",
+    incidentStreet: "",
+  });
+
+  useEffect(() => {
+    // Fetch cases from the database when the component mounts
+    const fetchCases = async () => {
+      try {
+        const response = await fetch("/api/cases");
+        const data = await response.json();
+        // Ensure that 'data' is an array before setting the state
+        if (data.success) {
+          setCases(data.data); // Set the fetched data
+        }
+      } catch (error) {
+        console.error("Error fetching cases:", error);
+        setCases([]); // Set an empty array on error
+      }
+    };
+
+    fetchCases();
+  }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const response = await fetch("/api/cases", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (response.ok) {
+      const newCase = await response.json();
+      setCases((prevCases) => [...prevCases, newCase]);
+      setFormData({
+        name: "",
+        caseType: "",
+        underSection: "",
+        dateOfBirth: "",
+        gender: "",
+        phoneNumber: "",
+        email: "",
+        state: "",
+        city: "",
+        street: "",
+        zipCode: "",
+        incidentDate: "",
+        incidentState: "",
+        incidentCity: "",
+        incidentStreet: "",
+      });
+    }
+  };
+
+  return (
+    <div>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+        <h2 className="text-xl font-semibold text-blue-900">Case Details</h2>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button className="bg-blue-600 text-white hover:bg-blue-700">Add Case</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[625px] bg-white">
+            <DialogHeader>
+              <DialogTitle className="text-blue-900">Add Case Details</DialogTitle>
+            </DialogHeader>
+            <ScrollArea className="max-h-[80vh]">
+              <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
+                  <Input name="name" value={formData.name} onChange={handleInputChange} placeholder="Name" />
+                  <Input name="caseType" value={formData.caseType} onChange={handleInputChange} placeholder="Case Type" />
+                  <Input name="underSection" value={formData.underSection} onChange={handleInputChange} placeholder="Under Section" />
+                  <Input name="dateOfBirth" value={formData.dateOfBirth} onChange={handleInputChange} placeholder="Date of Birth" />
+                  <Input name="gender" value={formData.gender} onChange={handleInputChange} placeholder="Gender" />
+                  <Input name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} placeholder="Phone Number" />
+                  <Input name="email" value={formData.email} onChange={handleInputChange} placeholder="Email" />
+                  <Input name="state" value={formData.state} onChange={handleInputChange} placeholder="State" />
+                  <Input name="city" value={formData.city} onChange={handleInputChange} placeholder="City" />
+                  <Input name="street" value={formData.street} onChange={handleInputChange} placeholder="Street" />
+                  <Input name="zipCode" value={formData.zipCode} onChange={handleInputChange} placeholder="Zip Code" />
+                  <Input name="incidentDate" value={formData.incidentDate} onChange={handleInputChange} placeholder="Incident Date" />
+                  <Input name="incidentState" value={formData.incidentState} onChange={handleInputChange} placeholder="Incident State" />
+                  <Input name="incidentCity" value={formData.incidentCity} onChange={handleInputChange} placeholder="Incident City" />
+                  <Input name="incidentStreet" value={formData.incidentStreet} onChange={handleInputChange} placeholder="Incident Street" />
+                </div>
+                <Button type="submit" className="mt-4 w-full bg-blue-600 text-white hover:bg-blue-700">Add </Button>
+              </form>
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+      </div>
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-blue-900 text-white">
+              <TableHead>Name</TableHead>
+              <TableHead>Case Type</TableHead>
+              <TableHead>Under Section</TableHead>
+              <TableHead>Date of Birth</TableHead>
+              <TableHead>Phone Number</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>State</TableHead>
+              <TableHead>City</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {cases.map((caseDetail) => (
+              <TableRow key={caseDetail._id}>
+                <TableCell>{caseDetail.name}</TableCell>
+                <TableCell>{caseDetail.caseType}</TableCell>
+                <TableCell>{caseDetail.underSection}</TableCell>
+                <TableCell>{caseDetail.dateOfBirth}</TableCell>
+                <TableCell>{caseDetail.phoneNumber}</TableCell>
+                <TableCell>{caseDetail.email}</TableCell>
+                <TableCell>{caseDetail.state}</TableCell>
+                <TableCell>{caseDetail.city}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+}
