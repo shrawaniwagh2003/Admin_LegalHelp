@@ -1,15 +1,34 @@
 'use client';
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CloudFog } from "lucide-react";
 
-export default function CaseDetails() {
-  const [cases, setCases] = useState([]); // Default state is an empty array
-  const [formData, setFormData] = useState({
+interface CaseDetails {
+  _id: string;
+  name: string;
+  caseType: string;
+  underSection: string;
+  dateOfBirth: string;
+  gender: string;
+  phoneNumber: string;
+  email: string;
+  state: string;
+  city: string;
+  street: string;
+  zipCode: string;
+  incidentDate: string;
+  incidentState: string;
+  incidentCity: string;
+  incidentStreet: string;
+}
+
+export default function CaseDetailsComponent() {
+  const [cases, setCases] = useState<CaseDetails[]>([]); // Default state is an empty array
+  const [formData, setFormData] = useState<Partial<CaseDetails>>({
     name: "",
     caseType: "",
     underSection: "",
@@ -28,25 +47,22 @@ export default function CaseDetails() {
   });
 
   useEffect(() => {
-    // Fetch cases from the database when the component mounts
     const fetchCases = async () => {
       try {
         const response = await fetch("/api/cases");
         const data = await response.json();
-        // Ensure that 'data' is an array before setting the state
         if (data.success) {
-          setCases(data.data); // Set the fetched data
+          setCases(data.data);
         }
       } catch (error) {
         console.error("Error fetching cases:", error);
-        setCases([]); // Set an empty array on error
       }
     };
 
     fetchCases();
   }, []);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
@@ -54,7 +70,7 @@ export default function CaseDetails() {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const response = await fetch("/api/cases", {
@@ -66,7 +82,7 @@ export default function CaseDetails() {
     });
 
     if (response.ok) {
-      const newCase = await response.json();
+      const newCase: CaseDetails = await response.json();
       setCases((prevCases) => [...prevCases, newCase]);
       setFormData({
         name: "",
@@ -119,7 +135,7 @@ export default function CaseDetails() {
                   <Input name="incidentCity" value={formData.incidentCity} onChange={handleInputChange} placeholder="Incident City" />
                   <Input name="incidentStreet" value={formData.incidentStreet} onChange={handleInputChange} placeholder="Incident Street" />
                 </div>
-                <Button type="submit" className="mt-4 w-full bg-blue-600 text-white hover:bg-blue-700">Add </Button>
+                <Button type="submit" className="mt-4 w-full bg-blue-600 text-white hover:bg-blue-700">Add</Button>
               </form>
             </ScrollArea>
           </DialogContent>
