@@ -2,56 +2,62 @@ import dbConnect from '../../../../lib/dbConnect';
 import Case from '../../../models/Cases';
 import { NextResponse } from 'next/server';
 
-export async function GET(req) {
-  await dbConnect();
-  try {
-    const cases = await Case.find({});
-    return NextResponse.json({ success: true, data: cases });
-  } catch (error) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-  }
+
+
+export async function GET(request) {
+  return new Response('Hello, Next.js!')
 }
 
-export async function POST(req) {
-  await dbConnect();
-  try {
-    const body = await req.json();
+// export async function GET(req) {
+//   await dbConnect();
+//   try {
+//     const cases = await Case.find({});
+//     return NextResponse.json({ success: true, data: cases });
+//   } catch (error) {
+//     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+//   }
+// }
 
-    // Validate incoming data
-    if (!body.name ) {
-      return NextResponse.json(
-        { success: false, error: 'Missing required fields.' },
-        { status: 400 }
-      );
-    }
+// export async function POST(req) {
+//   await dbConnect();
+//   try {
+//     const body = await req.json();
 
-    // Create new case
-    const newCase = await Case.create(body);
+//     // Validate incoming data
+//     if (!body.name ) {
+//       return NextResponse.json(
+//         { success: false, error: 'Missing required fields.' },
+//         { status: 400 }
+//       );
+//     }
 
-    // Return success with the created case data
-    return NextResponse.json({ success: true, data: newCase });
-  } catch (error) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-  }
-}
+//     // Create new case
+//     const newCase = await Case.create(body);
 
-export async function DELETE(req) {
-  await dbConnect();
-  try {
-    const { id } = await req.json(); // Assuming ID is passed in the request body for deletion
+//     // Return success with the created case data
+//     return NextResponse.json({ success: true, data: newCase });
+//   } catch (error) {
+//     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+//   }
+// }
 
-    if (!id) {
-      return NextResponse.json(
-        { success: false, error: 'Missing case ID to delete.' },
-        { status: 400 }
-      );
-    }
+// export async function DELETE(req) {
+//   await dbConnect();
+//   try {
+//     const { id } = await req.json(); // Assuming ID is passed in the request body for deletion
 
-    // Delete the case by ID
-    await Case.findByIdAndDelete(id);
+//     if (!id) {
+//       return NextResponse.json(
+//         { success: false, error: 'Missing case ID to delete.' },
+//         { status: 400 }
+//       );
+//     }
 
-    return NextResponse.json({ success: true, message: 'Case deleted successfully.' });
-  } catch (error) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-  }
-}
+//     // Delete the case by ID
+//     await Case.findByIdAndDelete(id);
+
+//     return NextResponse.json({ success: true, message: 'Case deleted successfully.' });
+//   } catch (error) {
+//     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+//   }
+// }

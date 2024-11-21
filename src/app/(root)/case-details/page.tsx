@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from "react";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -46,18 +47,19 @@ export default function CaseDetailsComponent() {
     incidentStreet: "",
   });
 
-  useEffect(() => {
-    const fetchCases = async () => {
-      try {
-        const response = await fetch("/api/cases");
-        const data = await response.json();
-        if (data.success) {
-          setCases(data.data);
-        }
-      } catch (error) {
-        console.error("Error fetching cases:", error);
+  const fetchCases = async () => {
+    try {
+      const response = await axios.get("http://localhost:8888/cases");
+      if (response.data.success) {
+        setCases(response.data.data);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching cases:", error);
+    }
+  };
+
+  useEffect(() => {
+
 
     fetchCases();
   }, []);
@@ -73,34 +75,34 @@ export default function CaseDetailsComponent() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const response = await fetch("/api/cases", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
+    try {
+      console.log(formData);
+      const response = await axios.post("http://localhost:8888/cases", formData);
 
-    if (response.ok) {
-      const newCase: CaseDetails = await response.json();
-      setCases((prevCases) => [...prevCases, newCase]);
-      setFormData({
-        name: "",
-        caseType: "",
-        underSection: "",
-        dateOfBirth: "",
-        gender: "",
-        phoneNumber: "",
-        email: "",
-        state: "",
-        city: "",
-        street: "",
-        zipCode: "",
-        incidentDate: "",
-        incidentState: "",
-        incidentCity: "",
-        incidentStreet: "",
-      });
+      if (response.status === 200) {
+        const newCase: CaseDetails = response.data.data;
+        await fetchCases();
+        setCases((prevCases) => [...prevCases, newCase]);
+        setFormData({
+          name: "",
+          caseType: "",
+          underSection: "",
+          dateOfBirth: "",
+          gender: "",
+          phoneNumber: "",
+          email: "",
+          state: "",
+          city: "",
+          street: "",
+          zipCode: "",
+          incidentDate: "",
+          incidentState: "",
+          incidentCity: "",
+          incidentStreet: "",
+        });
+      }
+    } catch (error) {
+      console.error("Error adding case:", error);
     }
   };
 
